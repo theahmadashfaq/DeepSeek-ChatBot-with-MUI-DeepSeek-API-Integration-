@@ -22,7 +22,7 @@ export const Chat = () => {
   const [message, setMessage] = useState('');
   const [conversation, setConversation] = useState([]);
   const [loading, setLoading] = useState(false);
-  // Pre-set the API key so it doesn't need to be entered
+  // Hardcode the API key directly in the application
   const [apiKey, setApiKey] = useState('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');
   const [apiKeySet, setApiKeySet] = useState(true); // Set to true by default
   const [showPassword, setShowPassword] = useState(false);
@@ -32,6 +32,8 @@ export const Chat = () => {
   useEffect(() => {
     scrollToBottom();
   }, [conversation]);
+  
+  // No need for any localStorage operations
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -104,21 +106,15 @@ export const Chat = () => {
 
   const saveApiKey = () => {
     if (apiKey.trim()) {
-      // Store API key in localStorage for persistence
-      localStorage.setItem('deepseek-api-key', apiKey.trim());
       setApiKeySet(true);
     }
   };
 
   const resetApiKey = () => {
-    setApiKeySet(false); // Show the API key input form
+    // Reset to the hardcoded API key instead of clearing it
+    setApiKey('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');
+    setConversation([]);
   };
-
-  // We'll skip loading from localStorage since we're pre-setting the key
-  // But we'll store it in localStorage so the reset functionality still works
-  useEffect(() => {
-    localStorage.setItem('deepseek-api-key', apiKey);
-  }, []);
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -171,7 +167,7 @@ export const Chat = () => {
           </Button>
           
           <Typography variant="caption" color="textSecondary" sx={{ mt: 2, display: 'block' }}>
-            Note: Your API key is stored in your browser's local storage for convenience.
+            Note: Your API key will only be stored in memory for this session and will need to be entered again if you refresh or close the page.
           </Typography>
         </Paper>
       </Container>
