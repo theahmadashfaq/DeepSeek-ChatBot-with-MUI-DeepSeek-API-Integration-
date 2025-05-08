@@ -7,25 +7,21 @@ import {
   Paper,
   Container,
   IconButton,
-  InputAdornment,
   Card,
   CardContent,
   Divider,
   CircularProgress
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export const Chat = () => {
   const [message, setMessage] = useState('');
   const [conversation, setConversation] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [apiKey, setApiKey] = useState('');
-  const [apiKeySet, setApiKeySet] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const messagesEndRef = useRef(null);
+  
+  // Hardcoded API key
+  const apiKey = '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';
 
   // Automatically scroll to bottom when conversation updates
   useEffect(() => {
@@ -45,7 +41,7 @@ export const Chat = () => {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'deepseek/deepseek-prover-v2:free',
+          model: 'deepseek/deepseek-r1:free',
           messages: messages,
           temperature: 0.7,
           max_tokens: 1000
@@ -101,97 +97,11 @@ export const Chat = () => {
     }
   };
 
-  const saveApiKey = () => {
-    if (apiKey.trim()) {
-      // Store API key in localStorage for persistence
-      // localStorage.setItem('deepseek-api-key', apiKey.trim());
-      setApiKeySet(true);
-    }
-  };
-
-  const resetApiKey = () => {
-
-    localStorage.removeItem('deepseek-api-key');
-    setApiKey('');
-    setApiKeySet(false);
-    
-  };
-
-  // Load API key from localStorage on component mount
-  useEffect(() => {
-    const savedApiKey = localStorage.getItem('deepseek-api-key');
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
-      setApiKeySet(true);
-    }
-  }, []);
-
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  if (!apiKeySet) {
-    return (
-      <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
-          <Typography  variant="h5" component="h2" gutterBottom>
-            DeepSeek Chat Setup
-          </Typography>
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
-            Enter your API key to start using DeepSeek Chat
-          </Typography>
-          
-          <TextField
-            label="DeepSeek API Key"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            type={showPassword ? 'text' : 'password'}
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="sk..."
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={toggleShowPassword}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-          
-          <Button 
-            variant="contained" 
-            color="primary"
-            fullWidth
-            size="large"
-            onClick={saveApiKey}
-            sx={{ mt: 2 }}
-            disabled={!apiKey.trim()}
-          >
-            Connect to DeepSeek API
-          </Button>
-          
-          <Typography variant="caption" color="textSecondary" sx={{ mt: 2, display: 'block' }}>
-            Note: Your API key is stored in your browser's local storage for convenience.
-          </Typography>
-        </Paper>
-      </Container>
-    );
-  }
-
   return (
     <Container maxWidth="md" sx={{ height: '100vh', py: 2, display: 'flex', flexDirection: 'column' }}>
       <Paper elevation={3} sx={{border:"2px solid white", display: 'flex', flexDirection: 'column', height: '100%', backgroundColor:"#F6F8FA" }}>
         <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e0e0e0' }}>
           <Typography sx={{display:"flex", justifyContent:"center"}}  variant="h6">DeepSeek Chat</Typography>
-          <IconButton onClick={resetApiKey} size="small" title="Change API Key">
-            <RefreshIcon />
-          </IconButton>
         </Box>
 
         <Box sx={{ 
@@ -235,7 +145,6 @@ export const Chat = () => {
                 <CardContent sx={{ py: 1, '&:last-child': { pb: 1 } }}>
                   <Typography 
                     variant="body1" 
-                    
                     color={msg.role === 'user' ? 'primary.dark' : msg.role === 'system' ? 'error.dark' : 'text.primary'}
                     sx={{ whiteSpace: 'pre-wrap' }}
                   >
@@ -264,7 +173,6 @@ export const Chat = () => {
           <Box sx={{ display: 'flex', gap: 1 }}>
             <TextField
               fullWidth
-              
               rows={2}
               variant="outlined"
               placeholder="Type your message..."
@@ -278,7 +186,7 @@ export const Chat = () => {
               color="primary"
               disabled={loading || !message.trim()}
               onClick={handleSendMessage}
-              sx={{ alignSelf: 'flex-end',  }}
+              sx={{ alignSelf: 'flex-end' }}
             >
               <SendIcon />
             </Button>
