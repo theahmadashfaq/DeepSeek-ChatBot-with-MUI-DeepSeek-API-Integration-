@@ -10,20 +10,25 @@ import {
   Card,
   CardContent,
   Divider,
-  CircularProgress
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Alert
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import KeyIcon from '@mui/icons-material/Key';
 
 export const Chat = () => {
   const [message, setMessage] = useState('');
   const [conversation, setConversation] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [isKeyDialogOpen, setIsKeyDialogOpen] = useState(true);
+  const [keyError, setKeyError] = useState('');
   const messagesEndRef = useRef(null);
   
-  // Hardcoded API key
-  const apiKey = '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';
-
-  // Automatically scroll to bottom when conversation updates
   useEffect(() => {
     scrollToBottom();
   }, [conversation]);
@@ -31,6 +36,21 @@ export const Chat = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const handleKeyChange = (e) => {
+    setApiKey(e.target.value);
+    setKeyError('');
+  };
+
+  const handleKeySubmit = () => {
+    if (!apiKey.trim()) {
+     
+      return;
+    }
+    setIsKeyDialogOpen(false);
+  };
+
+ 
 
   const getDeepSeekResponse = async (messages) => {
     try {
@@ -61,7 +81,7 @@ export const Chat = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!message.trim() || loading) return;
+    if (!message.trim() || loading || !apiKey) return;
     
     const userMessage = message.trim();
     const updatedConversation = [...conversation, { role: 'user', content: userMessage }];
@@ -85,6 +105,11 @@ export const Chat = () => {
         role: 'system', 
         content: `Error: ${error.message || 'Could not get response from DeepSeek API'}` 
       }]);
+      
+      // If we get an authentication error, prompt for new API key
+      if (error.message && (error.message.includes('authentication') || error.message.includes('API key') || error.message.includes('unauthorized'))) {
+        setIsKeyDialogOpen(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -101,7 +126,8 @@ export const Chat = () => {
     <Container maxWidth="md" sx={{ height: '100vh', py: 2, display: 'flex', flexDirection: 'column' }}>
       <Paper elevation={3} sx={{border:"2px solid white", display: 'flex', flexDirection: 'column', height: '100%', backgroundColor:"#F6F8FA" }}>
         <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e0e0e0' }}>
-          <Typography sx={{display:"flex", justifyContent:"center"}}  variant="h6">DeepSeek Chat</Typography>
+          <Typography variant="h6">DeepSeek Chat</Typography>
+          
         </Box>
 
         <Box sx={{ 
@@ -117,7 +143,7 @@ export const Chat = () => {
           {conversation.length === 0 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <Typography variant="body1" color="text.secondary">
-                Send a message to start chatting with DeepSeek
+                {apiKey ? 'Send a message to start chatting with DeepSeek' : 'Please enter your API key to start'}
               </Typography>
             </Box>
           )}
@@ -180,11 +206,12 @@ export const Chat = () => {
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               sx={{ flexGrow: 1 }}
+              disabled={!apiKey}
             />
             <Button
               variant="contained"
               color="primary"
-              disabled={loading || !message.trim()}
+              disabled={loading || !message.trim() || !apiKey}
               onClick={handleSendMessage}
               sx={{ alignSelf: 'flex-end' }}
             >
@@ -193,6 +220,40 @@ export const Chat = () => {
           </Box>
         </Box>
       </Paper>
+
+      {/* API Key Dialog */}
+      <Dialog 
+        open={isKeyDialogOpen} 
+        onClose={() => apiKey && setIsKeyDialogOpen(false)}
+        disableEscapeKeyDown={!apiKey}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Enter Open Router API Key</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 1 }}>
+            {keyError && <Alert severity="error" sx={{ mb: 2 }}>{keyError}</Alert>}
+            
+            <TextField
+              autoFocus
+              margin="dense"
+              label="API Key"
+              type="password"
+              fullWidth
+              variant="outlined"
+              value={apiKey}
+              onChange={handleKeyChange}
+              placeholder="sk-..."
+              error={!!keyError}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleKeySubmit} variant="contained" color="primary">
+            Save Key
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
