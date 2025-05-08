@@ -44,7 +44,6 @@ export const Chat = () => {
 
   const handleKeySubmit = () => {
     if (!apiKey.trim()) {
-     
       return;
     }
     setIsKeyDialogOpen(false);
@@ -125,8 +124,12 @@ export const Chat = () => {
   return (
     <Container maxWidth="md" sx={{ height: '100vh', py: 2, display: 'flex', flexDirection: 'column' }}>
       <Paper elevation={3} sx={{border:"2px solid white", display: 'flex', flexDirection: 'column', height: '100%', backgroundColor:"#F6F8FA" }}>
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e0e0e0' }}>
-          <Typography variant="h6">DeepSeek Chat</Typography>
+        <Box sx={{ p: 2, display: 'flex',  alignItems: 'center', borderBottom: '1px solid #e0e0e0' }}>
+          
+            <Box> <img  src='c.png'width={"20px"} height={"20px"}/></Box>
+            <Typography sx={{marginLeft:"10px"}} variant="h6">
+            Quanta.AI
+            </Typography>
           
         </Box>
 
