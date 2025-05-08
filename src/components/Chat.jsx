@@ -21,7 +21,7 @@ export const Chat = () => {
   const messagesEndRef = useRef(null);
   
   // Hardcoded API key
-  const apiKey = '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';
+  const apiKey = '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';
 
   // Automatically scroll to bottom when conversation updates
   useEffect(() => {
@@ -41,7 +41,7 @@ export const Chat = () => {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'deepseek/deepseek-chat-v3-0324:free',
+          model: 'deepseek/deepseek-r1-distill-qwen-14b:free',
           messages: messages,
           temperature: 0.7,
           max_tokens: 1000
