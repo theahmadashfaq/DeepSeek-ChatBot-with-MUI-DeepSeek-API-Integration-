@@ -21,7 +21,7 @@ export const Chat = () => {
   const messagesEndRef = useRef(null);
   
   // Hardcoded API key
-  const apiKey = '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';
+  const apiKey = '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';
 
   // Automatically scroll to bottom when conversation updates
   useEffect(() => {
